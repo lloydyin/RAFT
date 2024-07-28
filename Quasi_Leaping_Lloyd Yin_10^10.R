@@ -29,7 +29,7 @@ Time = list()
 # 均匀选一个         cpp_sample_one(v)
 # 均匀选两个         cpp_sample_two(v)
 # 按照向量权重选一个 cpp_weighted_sample_one(v)
-# 按矩阵权重选一个   samplePoint(m)              # 返回1*2矩阵
+# 按矩阵权重选一个   samplePoint(m)              # 1*2  matrix
 # 按照矩阵权重选多个 sampleMultiplePoints(m,n)   #
 ## Functions for C++ ############################################################
 library(Rcpp)
@@ -399,23 +399,23 @@ for(i in 1:(length(P_critical)-1)){
       if (Propagation!=0 & CTAChange!=0){
         Monomer = Monomer - Propagation
         P_Current = 1-Monomer/M
-        # 选择并删除参与交换的自由基
+        # Select and delete exchange Radical
         Selected_CTA = sample(0:500,CTAChange,prob=CTAgent,replace=TRUE)
         All_elements = c(Radical,as.numeric(Selected_CTA))
         Selected_CTA = table(Selected_CTA)
         Index = as.numeric(names(Selected_CTA))+1
         CTAgent[Index] = CTAgent[Index] - as.numeric(Selected_CTA)
         
-        # 增长
+        # Propagation
         Index = sample(length(All_elements),Propagation,replace = TRUE)
         Index = factor(Index, levels = 1:length(All_elements))
         Counts = table(Index)
         Index = 1:(Length_Radical+CTAChange)
         All_elements[Index] = All_elements[Index] + as.numeric(Counts)
         
-        # 返回自由基
+        # Return Free Radical
         Radical = All_elements[(CTAChange+1):(length(All_elements))]
-        # 返回CTAngent
+        # Return CTAngent
         CTAgent_Back = table(All_elements[1:(CTAChange)])
         Index = as.numeric(names(CTAgent_Back))+1
         CTAgent[Index] = CTAgent[Index] + as.numeric(CTAgent_Back)
@@ -570,7 +570,7 @@ for(i in 1:(length(P_critical)-1)){
         if (Propagation!=0 & CTAChange!=0){
           Monomer = Monomer - Propagation
           P_Current = 1-Monomer/M
-          # 选择并删除参与交换的自由基
+          # Select and delete exchange Radical
           Selected_Intermediate = sampleMultiplePoints(Intermediate,CTAChange)      # a n*2 matrix, every colmun is an index 
           # Intermediate = Selected_Intermediate$Updated_Matrix
           Selected_Intermediate = Selected_Intermediate$Selected_Index
@@ -588,20 +588,20 @@ for(i in 1:(length(P_critical)-1)){
           Index = as.numeric(names(Counts)) 
           All_elements[Index] = All_elements[Index] + as.numeric(Counts)
           
-          # 返回自由基
+          # Return Radical
           Radical = All_elements[(CTAChange+1):(length(All_elements))]
           
-          # 处理 CTAgent
+          # Deal CTAgent
           Selected_CTA = sample(1:501,CTAChange,prob=CTAgent,replace=TRUE)
-          # 删除 CTA
+          # Delete CTA
           Selected_CTA_table = table(Selected_CTA)
           Index = as.numeric(names(Selected_CTA_table))
           CTAgent[Index] = CTAgent[Index] - as.numeric(Selected_CTA_table)
-          # 返回 CTA
+          # Return CTA
           Index = as.numeric(names(CTA_Return)) # (1:501)
           CTAgent[Index] = CTAgent[Index] + as.numeric(CTA_Return)
           
-          # 返回 Intermediate
+          # Return Intermediate
           Intermediate_return = matrix(c(All_elements[1:(CTAChange)]+1,Selected_CTA),,2)
           incrementMatrix(Intermediate, Intermediate_return)
         } else if (CTAChange == 0){
@@ -854,20 +854,20 @@ for(i in 1:(length(P_critical)-1)){
             Index = as.numeric(names(Counts)) 
             All_elements[Index] = All_elements[Index] + as.numeric(Counts)
             
-            # 返回自由基
+            # Return Radical
             Radical = All_elements[(CTAChange+1):(length(All_elements))]
             
-            # 处理 CTAgent
+            # Deal CTAgent
             Selected_CTA = sample(1:501,CTAChange,prob=CTAgent,replace=TRUE)
-            # 删除 CTA
+            # Delete CTA
             Selected_CTA_table = table(Selected_CTA)
             Index = as.numeric(names(Selected_CTA_table))
             CTAgent[Index] = CTAgent[Index] - as.numeric(Selected_CTA_table)
-            # 返回 CTA
+            # Return CTA
             Index = as.numeric(names(CTA_Return)) # (1:501)
             CTAgent[Index] = CTAgent[Index] + as.numeric(CTA_Return)
             
-            # 返回 Intermediate
+            # Return Intermediate
             Intermediate_return = matrix(c(All_elements[1:(CTAChange)]+1,Selected_CTA),,2)
             incrementMatrix(Intermediate, Intermediate_return)
           } else if (CTAChange == 0){
@@ -1092,20 +1092,20 @@ for(i in 1:(length(P_critical)-1)){
       Monomer = Monomer - Propagation
       
       if (Propagation!=0 & CTAChange!=0){
-        # # 选择并删除参与交换的自由基
+        # # Select and delete exchange Radical
         # Selected_CTA = sample(0:5000,CTAChange,prob=CTAgent,replace=TRUE)
         # All_elements = c(Radical,as.numeric(Selected_CTA))
         # Selected_CTA = table(Selected_CTA)
         # Index = as.numeric(names(Selected_CTA))
         # CTAgent[Index+1] = CTAgent[Index+1] - as.numeric(Selected_CTA)
         # 
-        # # 四边形法则1, 构建反应顺序
-        # Index.Propagation = sort(sample(1:(Propagation+CTAChange), CTAChange, replace=F))      # 转移次数位置   行
-        # Index.CTAChange   =      sample(1:Length_Radical         , CTAChange, replace=T)       # 替换自由基坐标 列
+        # 
+        # Index.Propagation = sort(sample(1:(Propagation+CTAChange), CTAChange, replace=F))     
+        # Index.CTAChange   =      sample(1:Length_Radical         , CTAChange, replace=T)      
         # Temp.Propagation  = c(rep(0,Length_Radical), Index.Propagation , rep(Propagation,Length_Radical))
         # Temp.CTAChange    = c(1:Length_Radical     , Index.CTAChange   , 1:Length_Radical)
         # 
-        # # 处理顺序
+        # 
         # Unique_elements <- unique(Temp.CTAChange)
         # S_mat     = sapply(Unique_elements, function(xxx) Temp.Propagation[which( Temp.CTAChange == xxx)[1:max(table( Temp.CTAChange))]]) # Survival_matrix
         # Index.mat = sapply(Unique_elements, function(xxx)                  which(Index.CTAChange == xxx)[1:max(table(Index.CTAChange))])
@@ -1114,40 +1114,40 @@ for(i in 1:(length(P_critical)-1)){
         # S_mat                       = S_mat[-1,]-S_mat[-nrow(S_mat),]
         # S_Series = as.vector(na.omit(as.vector(t(S_mat)))) # 前Length_Radical个为原始自由基, 后面CTAChange个为Agent, 大小为存在时间(概率) #  Survival Series
         # 
-        # # 增长
+        # # Propagation
         # Index = sample(length(S_Series),Propagation,prob=S_Series,replace = TRUE)
         # Index = factor(Index, levels = 1:(Length_Radical+CTAChange))
         # Counts = table(Index)
         # Index = 1:(Length_Radical+CTAChange)
         # All_elements[Index] = All_elements[Index] + as.numeric(Counts)
         # 
-        # # 返回自由基
+        # # Return Radical
         # Index = rev(c(1:Length_Radical,Index.CTAChange))
         # Index.Remain = Length_Radical+CTAChange+1-sapply(unique(Index), function(x) which(Index == x)[1])
         # Radical = All_elements[Index.Remain]
         # 
-        # # 返回CTAngent
+        # # Return CTAagent
         # CTAgent_Back = table(All_elements[-Index.Remain])
         # Index = as.numeric(names(CTAgent_Back))
         # CTAgent[Index+1] = CTAgent[Index+1] + as.numeric(CTAgent_Back)
         
-        # 选择并删除参与交换的自由基
+        # Select and delete exchange Radical
         Selected_CTA = sample(0:5000,CTAChange,prob=CTAgent,replace=TRUE)
         All_elements = c(Radical,as.numeric(Selected_CTA))
         Selected_CTA = table(Selected_CTA)
         Index = as.numeric(names(Selected_CTA))+1
         CTAgent[Index] = CTAgent[Index] - as.numeric(Selected_CTA)
         
-        # 增长
+        # Propagation
         Index = sample(length(All_elements),Propagation,replace = TRUE)
         Index = factor(Index, levels = 1:length(All_elements))
         Counts = table(Index)
         Index = 1:(Length_Radical+CTAChange)
         All_elements[Index] = All_elements[Index] + as.numeric(Counts)
         
-        # 返回自由基
+        # Return Radicals
         Radical = All_elements[(CTAChange+1):(length(All_elements))]
-        # 返回CTAngent
+        # Return CTAngent
         CTAgent_Back = table(All_elements[1:(CTAChange+1)])
         Index = as.numeric(names(CTAgent_Back))+1
         CTAgent[Index] = CTAgent[Index] + as.numeric(CTAgent_Back)
@@ -1258,8 +1258,8 @@ for(i in 1:(length(P_critical)-1)){
 
 
 
-# 创建一个500*500的大矩阵
-set.seed(123) # 设置随机种子以便结果可重复
+# generate a 500*500 large matrix
+set.seed(123)
 matrix_size <- 500
 mat <- matrix(runif(matrix_size^2, min = 0.1, max = 10), nrow = matrix_size)
 
